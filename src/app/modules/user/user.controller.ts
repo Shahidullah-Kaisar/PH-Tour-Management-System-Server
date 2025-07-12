@@ -8,6 +8,7 @@ import { sendResponse } from "../../utils/sendResponse"
 
 
 const getAllUsers = catchAsync( async(req: Request, res: Response, next: NextFunction) => {
+
     const result = await UserServices.getAllUsers();
 
     // res.status(httpStatus.OK).json({
@@ -26,6 +27,7 @@ const getAllUsers = catchAsync( async(req: Request, res: Response, next: NextFun
 })
 
 const createUser = catchAsync( async( req: Request, res: Response, next: NextFunction ) => {
+
    const user = await UserServices.createUser(req.body)
 
     // res.status(httpStatus.CREATED).json({
@@ -61,7 +63,6 @@ const createUser = catchAsync( async( req: Request, res: Response, next: NextFun
 //         next(error)
 //     }
 // }
-
 
 
 
