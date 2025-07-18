@@ -8,25 +8,6 @@ import { sendResponse } from "../../utils/sendResponse"
 import { JwtPayload } from "jsonwebtoken"
 
 
-const getAllUsers = catchAsync( async(req: Request, res: Response, next: NextFunction) => {
-
-    const result = await UserServices.getAllUsers();
-
-    // res.status(httpStatus.OK).json({
-    //     success: true,
-    //     message: "All Users Retrieved Successfully",
-    //     data: users
-    // })
-
-    sendResponse( res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "All Users Retrieved Successfully",
-        data: result.data,
-        meta: result.meta
-    })
-})
-
 const createUser = catchAsync( async( req: Request, res: Response, next: NextFunction ) => {
 
    const user = await UserServices.createUser(req.body)
@@ -64,6 +45,26 @@ const createUser = catchAsync( async( req: Request, res: Response, next: NextFun
 //         next(error)
 //     }
 // }
+
+const getAllUsers = catchAsync( async(req: Request, res: Response, next: NextFunction) => {
+
+    const result = await UserServices.getAllUsers();
+
+    // res.status(httpStatus.OK).json({
+    //     success: true,
+    //     message: "All Users Retrieved Successfully",
+    //     data: users
+    // })
+
+    sendResponse( res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "All Users Retrieved Successfully",
+        data: result.data,
+        meta: result.meta
+    })
+})
+
 
 const updateUser = catchAsync( async( req: Request, res: Response, next: NextFunction ) => {
 
