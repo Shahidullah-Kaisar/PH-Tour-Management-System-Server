@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import httpStatus from 'http-status-codes';
 import { NextFunction, Request, Response } from "express";
@@ -9,20 +10,43 @@ import { JwtPayload } from 'jsonwebtoken';
 import AppError from '../../errorHelpers/AppError';
 import { createUserToken } from '../../utils/userToken';
 import { envVars } from '../../config/env';
-
-const credentialsLogin = catchAsync( async(req: Request, res: Response, next: NextFunction) => {
-
-    const loginInfo = await AuthServices.credentialsLogin(req.body);
+import passport from 'passport';
 
 
-    setAuthCookie( res, loginInfo)
+const credentialsLogin = catchAsync( async (req: Request, res: Response, next: NextFunction) => {
 
-    sendResponse( res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: "User Logged In Successfully",
-        data: loginInfo,
-    })
+    // const loginInfo = await AuthServices.credentialsLogin(req.body) //jodi passport.js er maddhome local authentication na kori tahlel use hobe
+
+    passport.authenticate("local", async (error: any, user: any, info: any) => {
+
+        if(error){
+            return next(new AppError(401, error)) 
+        }
+
+        if(!user) {
+            return next(new AppError(401, info.message)) 
+        }
+
+        const userTokens =await createUserToken(user)
+
+        const { password: pass, ...rest } = user.toObject();
+
+        
+        setAuthCookie( res, userTokens)
+    
+        sendResponse( res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "User Logged In Successfully",
+            data: {
+                accessToken: userTokens.accessToken,
+                refreshToken: userTokens.refreshToken,
+                user: rest
+            },
+        })
+
+    }) (req, res, next)
+
 })
 
 const getNewAccessToken = catchAsync( async(req: Request, res: Response, next: NextFunction) => {
