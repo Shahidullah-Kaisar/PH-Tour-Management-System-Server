@@ -5,6 +5,8 @@ import { User } from "./user.model";
 import bcrypt from "bcrypt"
 import { envVars } from '../../config/env';
 import { JwtPayload } from 'jsonwebtoken';
+import { userSearchableFields } from './user.constant';
+import { QueryBuilder } from '../../utils/QueryBuilder';
 
 
 const createUser = async (payload: Partial<IUser>) => {
@@ -27,18 +29,36 @@ const createUser = async (payload: Partial<IUser>) => {
 }
 
 
-const getAllUsers = async () => {
-    const users = await User.find({})
+const getAllUsers = async (query: Record<string, string>) => {
 
-    const totalUsers = await User.countDocuments()
+    const queryBuilder = new QueryBuilder(User.find(), query)
+
+    const usersData = queryBuilder
+        .filter()
+        .search(userSearchableFields)
+        .sort()
+        .fields()
+        .paginate();
+
+        const [data, meta] = await Promise.all([
+        usersData.build(),
+        queryBuilder.getMeta()
+    ])
 
     return {
-        data: users,
-        meta: {
-            total: totalUsers
-        }
+        data,
+        meta
     }
 }
+
+const getSingleUser = async (id: string) => {
+    const user = await User.findById(id);
+
+    return {
+        data: user
+    }
+};
+
 
 const updateUser = async (userId: string, payload: Partial<IUser>, decodeToken: JwtPayload) => {
 
@@ -77,5 +97,6 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodeToken: 
 export const UserServices = {
     createUser,
     getAllUsers,
+    getSingleUser,
     updateUser
 }
