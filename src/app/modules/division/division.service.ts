@@ -15,6 +15,7 @@ const createDivision = async (payload: IDivision) => {
     return division
 };
 
+
 const getAllDivisions = async (query: Record<string, string>) => {
      const queryBuilder = new QueryBuilder(Division.find(), query)
 
