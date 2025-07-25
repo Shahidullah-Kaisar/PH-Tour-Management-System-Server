@@ -1,4 +1,5 @@
 
+import { deleteImageFromCloudinary } from "../../config/cloudinary.config";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { tourSearchableFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
@@ -131,10 +132,40 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
         throw new Error("Tour not found.");
     }
 
-    const updatedTour = await Tour.findByIdAndUpdate(id, payload, { new: true });
+
+
+/*
+নতুন image যুক্ত করা হচ্ছে যদি থাকে payload.images-এ।
+যেসব image মুছে ফেলার জন্য বলা হয়েছে, সেগুলো বাদ দেওয়া হচ্ছে।
+পুরনো image গুলো থেকে যেগুলো রাখার কথা, সেগুলো রাখা হচ্ছে।
+
+*/
+
+    if (payload.images && payload.images.length > 0 && existingTour.images && existingTour.images.length > 0) {
+        payload.images = [...payload.images, ...existingTour.images]
+    }
+
+    if (payload.deleteImages && payload.deleteImages.length > 0 && existingTour.images && existingTour.images.length > 0) { //for mongodb update img url
+
+        const restDBImages = existingTour.images.filter(imageUrl => !payload.deleteImages?.includes(imageUrl)) //delete korte bola img mongodb theke baad dibe tarpor ja thakbe seta restDBImages er moddhe store hobe.. 
+
+        const updatedPayloadImages = (payload.images || [])
+            .filter(imageUrl => !payload.deleteImages?.includes(imageUrl)) // যেগুলো delete করা হচ্ছে → বাদ দিচ্ছে
+            .filter(imageUrl => !restDBImages.includes(imageUrl)) //The images I'm providing are the ones that aren't already in restDBImages — those will be stored.
+
+        payload.images = [...restDBImages, ...updatedPayloadImages]
+
+    }
+
+    const updatedTour = await Tour.findByIdAndUpdate(id, payload, { new: true });//for cloudinary img deletion after update img..
+
+     if (payload.deleteImages && payload.deleteImages.length > 0 && existingTour.images && existingTour.images.length > 0) {
+        await Promise.all(payload.deleteImages.map(url => deleteImageFromCloudinary(url)))
+    }
 
     return updatedTour;
 };
+
 
 const deleteTour = async (id: string) => {
     return await Tour.findByIdAndDelete(id);
