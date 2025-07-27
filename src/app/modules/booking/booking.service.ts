@@ -94,7 +94,6 @@ const createBooking = async (payload: Partial<IBooking>, userId: string) => {
 
 
 const getUserBookings = async () => {
-   
 
     return {}
 };

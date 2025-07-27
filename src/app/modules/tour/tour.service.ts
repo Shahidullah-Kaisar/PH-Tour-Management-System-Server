@@ -133,7 +133,6 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
     }
 
 
-
 /*
 নতুন image যুক্ত করা হচ্ছে যদি থাকে payload.images-এ।
 যেসব image মুছে ফেলার জন্য বলা হয়েছে, সেগুলো বাদ দেওয়া হচ্ছে।
@@ -172,6 +171,7 @@ const deleteTour = async (id: string) => {
 };
 
 
+//Tour types
 
 const createTourType = async (payload: ITourType) => {
     const existingTourType = await TourType.findOne({ name: payload.name });
@@ -210,6 +210,7 @@ const deleteTourType = async (id: string) => {
 
     return await TourType.findByIdAndDelete(id);
 };
+
 
 export const TourService = {
     createTour,

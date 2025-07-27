@@ -12,6 +12,7 @@ import { multerUpload } from "../../config/multer.config";
 
 const router = express.Router();
 
+
 /* ------------------ TOUR TYPE ROUTES -------------------- */
 router.get("/tour-types", TourController.getAllTourTypes);
 
@@ -30,6 +31,7 @@ router.patch(
 );
 
 router.delete("/tour-types/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.deleteTourType);
+
 
 /* --------------------- TOUR ROUTES ---------------------- */
 router.get("/", TourController.getAllTours);
@@ -53,6 +55,8 @@ router.patch(
 );
 
 router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.deleteTour);
+
+
 
 
 
